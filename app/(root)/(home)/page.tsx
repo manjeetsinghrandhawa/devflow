@@ -5,6 +5,7 @@ import { HomePageFilters } from "@/constants/filters";
 import Filter from "@/components/shared/Filter";
 import HomeFilters from "@/components/home/HomeFilters";
 import NoResult from "@/components/shared/NoResult";
+// import { PageProps } from "@/types";
 // import QuestionCard from '@/components/cards/QuestionCard';
 // import {
 //   getQuestions,
@@ -22,7 +23,7 @@ export const metadata: Metadata = {
   description: "Home page of Dev Overflow",
 };
 
-export default async function Home({ searchParams }: SearchParamsProps) {
+export default async function Home() {
   const result = await getQuestions({});
 
   console.log(result.questions);
