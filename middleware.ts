@@ -1,4 +1,8 @@
-import { clerkMiddleware, createRouteMatcher } from "@clerk/nextjs/server";
+import {
+  clerkMiddleware,
+  createRouteMatcher,
+  auth,
+} from "@clerk/nextjs/server";
 
 // Define protected routes
 const isProtectedRoute = createRouteMatcher(["/ask-question"]);
@@ -22,10 +26,11 @@ export default clerkMiddleware(async (auth, req) => {
   if (publicRoutes.includes(req.nextUrl.pathname)) {
     return;
   }
+  const { userId } = await auth(); // Get auth details for the current request
 
-  // Protect all other routes matched by `isProtectedRoute`
-  if (isProtectedRoute(req)) {
-    await auth.protect();
+  // Enforce authentication for protected routes
+  if (isProtectedRoute(req) && !userId) {
+    return new Response("Unauthorized", { status: 401 }); // Return 401 if no userId
   }
 });
 
@@ -33,7 +38,14 @@ export const config = {
   matcher: [
     // Match all API and specific routes
     "/((?!_next|[^?]\\.(?:html?|css|js(?!on)|jpe?g|webp|png|gif|svg|ttf|woff2?|ico|csv|docx?|xlsx?|zip|webmanifest)).)",
-    "/api/(.*)",
+    "/",
+    "/api/webhook",
+    "question/:id",
+    "/tags",
+    "/tags/:id",
+    "/profile/:id",
+    "commiunity",
+    "/jobs",
     "/ask-question",
   ],
 };
