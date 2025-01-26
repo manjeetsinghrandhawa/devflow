@@ -6,7 +6,7 @@ const isProtectedRoute = createRouteMatcher(["/ask-question"]);
 // Define public routes
 const publicRoutes = [
   "/",
-  "/app/api/webhook",
+  "/api/webhook",
   "question/:id",
   "/tags",
   "/tags/:id",
@@ -15,14 +15,11 @@ const publicRoutes = [
   "/jobs",
 ];
 
-const ignoredRoutes = ["/app/api/webhook", "/app/api/chatgpt"];
+// const ignoredRoutes = ["/app/api/webhook", "/app/api/chatgpt"];
 
 export default clerkMiddleware(async (auth, req) => {
   // Bypass authentication for public routes
-  if (
-    publicRoutes.includes(req.nextUrl.pathname) &&
-    ignoredRoutes.includes(req.nextUrl.pathname)
-  ) {
+  if (publicRoutes.includes(req.nextUrl.pathname)) {
     return;
   }
 
