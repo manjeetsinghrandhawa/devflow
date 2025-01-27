@@ -1,5 +1,10 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  experimental: {
+    serverActions: true,
+    mdxRs: true,
+    serverComponentsExternalPackages: ["mongoose"],
+  },
   images: {
     remotePatterns: [
       {
@@ -10,12 +15,7 @@ const nextConfig = {
         protocol: "http",
         hostname: "*",
       },
-    ], // Add picsum.photos here
-  },
-  experimental: {
-    serverActions: true,
-    mxrs: true,
-    serverComponentsExternalPackages: ["mongoose"],
+    ],
   },
 };
 

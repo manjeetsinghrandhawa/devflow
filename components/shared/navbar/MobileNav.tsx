@@ -4,6 +4,7 @@ import {
   Sheet,
   SheetClose,
   SheetContent,
+  SheetTitle, // Assuming `SheetTitle` corresponds to `DialogTitle`
   SheetTrigger,
 } from "@/components/ui/sheet";
 import Link from "next/link";
@@ -12,6 +13,7 @@ import { SignedOut } from "@clerk/nextjs";
 import { Button } from "@/components/ui/button";
 import { sidebarLinks } from "@/constants";
 import { usePathname } from "next/navigation";
+
 const NavContent = () => {
   const pathname = usePathname();
   return (
@@ -24,7 +26,7 @@ const NavContent = () => {
           <SheetClose asChild key={link.label}>
             <Link
               href={link.route}
-              className={` ${
+              className={`${
                 isActive
                   ? "primary-gradient rounded-lg text-light-900 "
                   : "text-dark300_light900"
@@ -54,7 +56,7 @@ const MobileNav = () => {
       <SheetTrigger asChild>
         <Image
           src="/assets/icons/hamburger.svg"
-          alt="Humburger menu"
+          alt="Hamburger menu"
           width={36}
           height={36}
           className="invert-colors cursor-pointer sm:hidden"
@@ -64,6 +66,8 @@ const MobileNav = () => {
         side={"left"}
         className="background-light900_dark200 border-none"
       >
+        <SheetTitle className="sr-only">Navigation Menu</SheetTitle>{" "}
+        {/* Add this */}
         <Link href="/" className="flex items-center gap-1">
           <Image
             src={"/assets/images/site-logo.svg"}
@@ -71,11 +75,10 @@ const MobileNav = () => {
             height={23}
             alt="Devflow"
           />
-          <p className="h2-bold  text-dark100_light900 font-spaceGrotesk ">
+          <p className="h2-bold text-dark100_light900 font-spaceGrotesk">
             Dev <span className="text-primary-500">Overflow</span>
           </p>
         </Link>
-
         <div>
           <SheetClose asChild>
             <NavContent />
@@ -86,7 +89,7 @@ const MobileNav = () => {
               <SheetClose asChild>
                 <Link href="/sign-in">
                   <Button className="small-medium btn-secondary min-h-[41px] w-full rounded-lg px-4 py-3 shadow-none">
-                    <span className="primary-text-gradient ">Log In</span>
+                    <span className="primary-text-gradient">Log In</span>
                   </Button>
                 </Link>
               </SheetClose>
@@ -104,4 +107,5 @@ const MobileNav = () => {
     </Sheet>
   );
 };
+
 export default MobileNav;
