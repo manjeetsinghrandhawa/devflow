@@ -4,7 +4,7 @@ import {
   Sheet,
   SheetClose,
   SheetContent,
-  SheetTitle, // Assuming `SheetTitle` corresponds to `DialogTitle`
+  SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet";
 import Link from "next/link";
@@ -63,12 +63,11 @@ const MobileNav = () => {
         />
       </SheetTrigger>
       <SheetContent
-        side={"left"}
-        className="background-light900_dark200 border-none"
+        side="left"
+        className="background-light900_dark200 border-none flex flex-col"
       >
-        <SheetTitle className="sr-only">Navigation Menu</SheetTitle>{" "}
-        {/* Add this */}
-        <Link href="/" className="flex items-center gap-1">
+        <SheetTitle className="sr-only">Navigation Menu</SheetTitle>
+        <Link href="/" className="flex items-center gap-1 mb-4">
           <Image
             src={"/assets/images/site-logo.svg"}
             width={23}
@@ -79,30 +78,33 @@ const MobileNav = () => {
             Dev <span className="text-primary-500">Overflow</span>
           </p>
         </Link>
-        <div>
+
+        {/* Scrollable container for navigation links */}
+        <div className="flex-1 overflow-y-auto">
           <SheetClose asChild>
             <NavContent />
           </SheetClose>
-
-          <SignedOut>
-            <div className="flex flex-col gap-3">
-              <SheetClose asChild>
-                <Link href="/sign-in">
-                  <Button className="small-medium btn-secondary min-h-[41px] w-full rounded-lg px-4 py-3 shadow-none">
-                    <span className="primary-text-gradient">Log In</span>
-                  </Button>
-                </Link>
-              </SheetClose>
-              <SheetClose asChild>
-                <Link href="/sign-up">
-                  <Button className="small-medium light-border-2 btn-tertiary text-dark400_light900 min-h-[41px] w-full rounded-lg px-4 py-3 shadow-none">
-                    Sign Up
-                  </Button>
-                </Link>
-              </SheetClose>
-            </div>
-          </SignedOut>
         </div>
+
+        {/* Fixed section for buttons */}
+        <SignedOut>
+          <div className="flex flex-col gap-3 pt-4 border-t border-dark300_light900">
+            <SheetClose asChild>
+              <Link href="/sign-in">
+                <Button className="small-medium btn-secondary min-h-[41px] w-full rounded-lg px-4 py-3 shadow-none">
+                  <span className="primary-text-gradient">Log In</span>
+                </Button>
+              </Link>
+            </SheetClose>
+            <SheetClose asChild>
+              <Link href="/sign-up">
+                <Button className="small-medium light-border-2 btn-tertiary text-dark400_light900 min-h-[41px] w-full rounded-lg px-4 py-3 shadow-none">
+                  Sign Up
+                </Button>
+              </Link>
+            </SheetClose>
+          </div>
+        </SignedOut>
       </SheetContent>
     </Sheet>
   );
