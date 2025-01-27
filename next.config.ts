@@ -1,7 +1,21 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   images: {
-    domains: ["img.clerk.com"], // Add picsum.photos here
+    remotePatterns: [
+      {
+        protocol: "https",
+        hostname: "*",
+      },
+      {
+        protocol: "http",
+        hostname: "*",
+      },
+    ], // Add picsum.photos here
+  },
+  experimental: {
+    serverActions: true,
+    mxrs: true,
+    serverComponentsExternalPackages: ["mongoose"],
   },
 };
 
