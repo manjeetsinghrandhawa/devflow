@@ -64,7 +64,7 @@ const MobileNav = () => {
       </SheetTrigger>
       <SheetContent
         side="left"
-        className="background-light900_dark200 border-none flex flex-col"
+        className="bg-white dark:background-light900_dark200 border-none flex flex-col"
       >
         <SheetTitle className="sr-only">Navigation Menu</SheetTitle>
         <Link href="/" className="flex items-center gap-1 mb-4">
