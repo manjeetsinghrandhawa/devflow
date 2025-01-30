@@ -9,36 +9,90 @@ import {
   FormItem,
   FormMessage,
 } from "../ui/form";
+import Image from "next/image";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { AnswerSchma } from "@/lib/validitions";
+import { AnswerSchema } from "@/lib/validitions";
 import { Editor } from "@tinymce/tinymce-react";
 import { useTheme } from "@/context/ThemeProvider";
 import { Button } from "../ui/button";
+import { usePathname } from "next/navigation";
+import { createAnswer } from "@/lib/actions/answer.action";
 
-const Answer = () => {
+interface Props {
+  question: string;
+  questionId: string;
+  authorId: string;
+}
+
+const Answer = ({ question, questionId, authorId }: Props) => {
+  const pathname = usePathname();
+
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isSubmittingAI, setIsSubmittingAI] = useState(false);
   const { mode } = useTheme();
   const editorRef = useRef(null);
-  const form = useForm<z.infer<typeof AnswerSchma>>({
-    resolver: zodResolver(AnswerSchma),
+  const form = useForm<z.infer<typeof AnswerSchema>>({
+    resolver: zodResolver(AnswerSchema),
     defaultValues: {
       answer: "",
     },
   });
 
-  const handleCreatAnswer = (data) => {};
+  const handleCreateAnswer = async (values: z.infer<typeof AnswerSchema>) => {
+    setIsSubmitting(true);
+
+    try {
+      await createAnswer({
+        content: values.answer,
+        author: JSON.parse(authorId),
+        question: JSON.parse(questionId),
+        path: pathname,
+      });
+
+      form.reset();
+
+      if (editorRef.current) {
+        const editor = editorRef.current as any;
+
+        editor.setContent("");
+      }
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
   return (
     <div className="mt-8">
       <div className="flex flex-col justify-between gap-5 sm:flex-row sm:items-center sm:gap-2">
         <h4 className="paragraph-semibold text-dark400_light800">
           Write your answer here
         </h4>
+        <Button
+          className="btn light-border-2 gap-1.5 rounded-md px-4 py-2.5 text-primary-500 shadow-none dark:text-primary-500 "
+          onClick={() => {}}
+        >
+          {isSubmittingAI ? (
+            <>Generating...</>
+          ) : (
+            <>
+              <Image
+                src="/assets/icons/stars.svg"
+                alt="star"
+                width={12}
+                height={12}
+                className="object-contain"
+              />
+              Generate AI answer
+            </>
+          )}
+        </Button>
       </div>
       <Form {...form}>
         <form
           className="mt-6 flex w-full flex-col gap-10"
-          onSubmit={form.handleSubmit(handleCreatAnswer)}
+          onSubmit={form.handleSubmit(handleCreateAnswer)}
         >
           <FormField
             control={form.control}

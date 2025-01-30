@@ -11,7 +11,6 @@ export const metadata: Metadata = {
 };
 
 const AskQuestion = async () => {
-  // const userId = "123456789";
   const { userId } = await auth();
 
   if (!userId) redirect("/sign-in");
@@ -22,10 +21,7 @@ const AskQuestion = async () => {
     <div>
       <h1 className="h1-bold text-dark100_light900">Ask a question</h1>
       <div className="mt-9">
-        <Question
-          mongoUserId={JSON.stringify(mongoUser?._id)}
-          key={mongoUser}
-        />
+        <Question mongoUserId={JSON.stringify(mongoUser?._id)} />
       </div>
     </div>
   );

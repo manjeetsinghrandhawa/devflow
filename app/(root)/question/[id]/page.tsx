@@ -2,9 +2,30 @@ import { getQuestionById } from "@/lib/actions/question.action";
 import Link from "next/link";
 import Image from "next/image";
 import Metric from "@/components/shared/Metric";
-import { formatAndDivideNumber, getTimeStamp } from "@/lib/utils";
+import { formatAndDivideNumber, getTimestamp } from "@/lib/utils";
+import ParseHTML from "@/components/shared/ParseHTML";
+import RenderTag from "@/components/shared/RenderTag";
+import Answer from "@/components/forms/Answer";
+import { auth } from "@clerk/nextjs/server";
+import { getUserById } from "@/lib/actions/user.action";
+import AllAnswers from "@/components/shared/AllAnswers";
 
-const page = async ({ params, searchParams }) => {
+interface QuestionDetailsProps {
+  params: {
+    id: string;
+  };
+  searchParams: { [key: string]: string | undefined };
+}
+
+const page = async ({ params, searchParams }: QuestionDetailsProps) => {
+  const { userId: clerkId } = await auth();
+
+  let mongoUser;
+
+  if (clerkId) {
+    mongoUser = await getUserById({ userId: clerkId });
+  }
+
   const { question } = await getQuestionById({ questionId: params.id });
 
   return (
@@ -36,7 +57,7 @@ const page = async ({ params, searchParams }) => {
         <Metric
           imgUrl="/assets/icons/clock.svg"
           alt="=clock icon"
-          value={`- asked ${getTimeStamp(question.createdAt)}`}
+          value={`- asked ${getTimestamp(question.createdAt)}`}
           title="Asked"
           textStyles="small-medium text-dark400_light800"
         />
@@ -55,6 +76,34 @@ const page = async ({ params, searchParams }) => {
           textStyles="small-medium text-dark400_light800"
         />
       </div>
+
+      {/* Parsing code to show in Ui */}
+      <ParseHTML data={question.content} />
+
+      {/* Rending Tags */}
+      <div className="mt-8 flex flex-wrap gap-2">
+        {question.tags.map((tag: any) => (
+          <RenderTag
+            key={tag._id}
+            _id={tag._id}
+            name={tag.name}
+            showCount={false}
+          />
+        ))}
+      </div>
+
+      <AllAnswers
+        questionId={question._id}
+        userId={JSON.stringify(mongoUser._id)}
+        totalAnswers={question.answers.length}
+      />
+
+      {/* All Answers */}
+      <Answer
+        question={question.content}
+        questionId={JSON.stringify(question._id)}
+        authorId={JSON.stringify(mongoUser._id)}
+      />
     </>
   );
 };
