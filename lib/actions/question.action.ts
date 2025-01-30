@@ -1,110 +1,53 @@
 "use server";
 
-import { connectToDatabase } from "../mongoose";
-import Tag from "@/database/tag.model";
 import Question from "@/database/question.model";
+import Tag from "@/database/tag.model";
+import { connectToDatabase } from "../mongoose";
 import {
   CreateQuestionParams,
   GetQuestionByIdParams,
   GetQuestionsParams,
+  QuestionVoteParams,
 } from "./shared.types";
 import User from "@/database/user.model";
 import { revalidatePath } from "next/cache";
-import path from "path";
 
-export const getQuestions = async (params: GetQuestionsParams) => {
+export async function getQuestions(params: GetQuestionsParams) {
   try {
     connectToDatabase();
-    // const { searchQuery, filter, page = 1, pageSize = 10 } = params;
-
-    // calculate the no of posts to skip based on page number and page size
-    // pagination: skip = (page - 1) * pageSize
-
-    // const skipAmount = (page - 1) * pageSize;
-
-    // const query: FilterQuery<typeof Question> = {};
-
-    // if (searchQuery) {
-    //   query.$or = [
-    //     { title: { $regex: new RegExp(searchQuery, 'i') } },
-    //     { content: { $regex: new RegExp(searchQuery, 'i') } }
-    //   ];
-    // }
-
-    // let sortOptions = {};
-
-    // switch (filter) {
-    //   case 'newest':
-    //     sortOptions = { createdAt: -1 };
-    //     break;
-
-    //   case 'frequent':
-    //     sortOptions = { views: -1 };
-    //     break;
-
-    //   case 'unanswered':
-    //     query.answers = { $size: 0 };
-    //     break;
-
-    //   default:
-    //     break;
-    // }
 
     const questions = await Question.find({})
-      .populate({
-        path: "tags",
-        model: Tag,
-      })
+      .populate({ path: "tags", model: Tag })
       .populate({ path: "author", model: User })
       .sort({ createdAt: -1 });
-    // .skip(skipAmount)
-    // .limit(pageSize)
-    // .sort(sortOptions);
 
-    // const totalQuestions = await Question.countDocuments(query);
-
-    // const isNext = totalQuestions > skipAmount + questions.length;
-
-    return {
-      questions,
-      //  isNext
-    };
+    return { questions };
   } catch (error) {
     console.log(error);
     throw error;
   }
-};
+}
 
-export const createQuestion = async (params: CreateQuestionParams) => {
-  // eslint-disable-next-line no-empty
+export async function createQuestion(params: CreateQuestionParams) {
   try {
-    // connect to DATABASE
-    console.log("Connecting to db");
     connectToDatabase();
-    console.log("taking params");
+
     const { title, content, tags, author, path } = params;
 
-    // create a new question
-    console.log("start to create a question");
+    // Create the question
     const question = await Question.create({
       title,
       content,
       author,
     });
-    console.log("Question created");
 
-    // tag documents array
     const tagDocuments = [];
 
-    // create tags or get them if they already exist
+    // Create the tags or get them if they already exist
     for (const tag of tags) {
       const existingTag = await Tag.findOneAndUpdate(
-        {
-          name: {
-            $regex: new RegExp(`^${tag}$`, "i"),
-          },
-        },
-        { $setOnInsert: { name: tag }, $push: { questions: question._id } },
+        { name: { $regex: new RegExp(`^${tag}$`, "i") } },
+        { $setOnInsert: { name: tag }, $push: { question: question._id } },
         { upsert: true, new: true }
       );
 
@@ -115,17 +58,18 @@ export const createQuestion = async (params: CreateQuestionParams) => {
       $push: { tags: { $each: tagDocuments } },
     });
 
-    // todo: create a interaction record for the user's ask question action
-    revalidatePath(path);
-  } catch (error) {
-    console.log("error while creating a question");
-    throw error;
-  }
-};
+    // Create an interaction record for the user's ask_question action
 
-export const getQuestionById = async (params: GetQuestionByIdParams) => {
+    // Increment author's reputation by +5 for creating a question
+
+    revalidatePath(path);
+  } catch (error) {}
+}
+
+export async function getQuestionById(params: GetQuestionByIdParams) {
   try {
     connectToDatabase();
+
     const { questionId } = params;
 
     const question = await Question.findById(questionId)
@@ -136,9 +80,81 @@ export const getQuestionById = async (params: GetQuestionByIdParams) => {
         select: "_id clerkId name picture",
       });
 
-    return { question };
+    return question;
   } catch (error) {
     console.log(error);
     throw error;
   }
-};
+}
+
+export async function upvoteQuestion(params: QuestionVoteParams) {
+  try {
+    connectToDatabase();
+
+    const { questionId, userId, hasupVoted, hasdownVoted, path } = params;
+
+    let updateQuery = {};
+
+    if (hasupVoted) {
+      updateQuery = { $pull: { upvotes: userId } };
+    } else if (hasdownVoted) {
+      updateQuery = {
+        $pull: { downvotes: userId },
+        $push: { upvotes: userId },
+      };
+    } else {
+      updateQuery = { $addToSet: { upvotes: userId } };
+    }
+
+    const question = await Question.findByIdAndUpdate(questionId, updateQuery, {
+      new: true,
+    });
+
+    if (!question) {
+      throw new Error("Question not found");
+    }
+
+    // Increment author's reputation
+
+    revalidatePath(path);
+  } catch (error) {
+    console.log(error);
+    throw error;
+  }
+}
+
+export async function downvoteQuestion(params: QuestionVoteParams) {
+  try {
+    connectToDatabase();
+
+    const { questionId, userId, hasupVoted, hasdownVoted, path } = params;
+
+    let updateQuery = {};
+
+    if (hasdownVoted) {
+      updateQuery = { $pull: { downvote: userId } };
+    } else if (hasupVoted) {
+      updateQuery = {
+        $pull: { upvotes: userId },
+        $push: { downvotes: userId },
+      };
+    } else {
+      updateQuery = { $addToSet: { downvotes: userId } };
+    }
+
+    const question = await Question.findByIdAndUpdate(questionId, updateQuery, {
+      new: true,
+    });
+
+    if (!question) {
+      throw new Error("Question not found");
+    }
+
+    // Increment author's reputation
+
+    revalidatePath(path);
+  } catch (error) {
+    console.log(error);
+    throw error;
+  }
+}
