@@ -12,14 +12,7 @@ import Image from "next/image";
 import Link from "next/link";
 import React from "react";
 
-interface QuestionDetailsProps {
-  params: {
-    id: string;
-  };
-  searchParams: { [key: string]: string | undefined };
-}
-
-const Page = async ({ params, searchParams }: QuestionDetailsProps) => {
+const Page = async ({ params }: any) => {
   const { userId: clerkId } = await auth();
 
   let mongoUser;
