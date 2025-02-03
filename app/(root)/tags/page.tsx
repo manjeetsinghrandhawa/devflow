@@ -1,15 +1,12 @@
 import UserCard from "@/components/cards/UserCard";
 import Filter from "@/components/shared/Filter";
 import NoResult from "@/components/shared/NoResult";
-// import Pagination from '@/components/shared/Pagination/Pagination';
-import LocalSearchBar from "@/components/shared/search/LocalSearchbar";
+import LocalSearchbar from "@/components/shared/search/LocalSearchbar";
 import { UserFilters } from "@/constants/filters";
 import { getAllTags } from "@/lib/actions/tag.actions";
-// import { getAllUsers } from "@/lib/actions/user.action";
-// import { SearchParamsProps } from '@/types';
 import Link from "next/link";
 
-const page = async ({}) => {
+const Page = async () => {
   const result = await getAllTags({});
 
   return (
@@ -17,11 +14,11 @@ const page = async ({}) => {
       <h1 className="h1-bold text-dark100_light900">All Tags</h1>
 
       <div className="mt-11 flex justify-between gap-5 max-sm:flex-col sm:items-center">
-        <LocalSearchBar
+        <LocalSearchbar
           route="/tags"
           iconPosition="left"
           imgSrc="/assets/icons/search.svg"
-          placeholder="Search for amazing minds"
+          placeholder="Search for tags"
           otherClasses="flex-1"
         />
 
@@ -45,6 +42,7 @@ const page = async ({}) => {
                     {tag.name}
                   </p>
                 </div>
+
                 <p className="small-medium text-dark400_light500 mt-3.5">
                   <span className="body-semibold primary-text-gradient mr-2.5">
                     {tag.questions.length}+
@@ -56,14 +54,15 @@ const page = async ({}) => {
           ))
         ) : (
           <NoResult
-            title="No tags found"
-            description="Looks like there are no tags found"
+            title="No Tags Found"
+            description="It looks like there are no tags found."
             link="/ask-question"
-            linkTitle="Ask a questoin"
+            linkTitle="Ask a question"
           />
         )}
       </section>
     </>
   );
 };
-export default page;
+
+export default Page;
