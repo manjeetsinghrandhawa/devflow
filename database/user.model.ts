@@ -3,19 +3,19 @@ import { Schema, models, model, Document } from "mongoose";
 export interface IUser extends Document {
   clerkId: string;
   name: string;
-  username?: string;
+  username: string;
   email: string;
   password?: string;
   bio?: string;
   picture: string;
   location?: string;
-  portfolioWebSite?: string;
+  portfolioWebsite?: string;
   reputation?: number;
-  saved?: Schema.Types.ObjectId[];
-  joinAt: Date;
+  saved: Schema.Types.ObjectId[];
+  joinedAt: Date;
 }
 
-const userSchema = new Schema({
+const UserSchema = new Schema({
   clerkId: { type: String, required: true },
   name: { type: String, required: true },
   username: { type: String, required: true, unique: true },
@@ -24,12 +24,12 @@ const userSchema = new Schema({
   bio: { type: String },
   picture: { type: String, required: true },
   location: { type: String },
-  portfolioWebSite: { type: String },
+  portfolioWebsite: { type: String },
   reputation: { type: Number, default: 0 },
   saved: [{ type: Schema.Types.ObjectId, ref: "Question" }],
-  joinAt: { type: Date, default: Date.now },
+  joinedAt: { type: Date, default: Date.now },
 });
 
-const User = models.User || model("User", userSchema);
+const User = models.User || model("User", UserSchema);
 
 export default User;

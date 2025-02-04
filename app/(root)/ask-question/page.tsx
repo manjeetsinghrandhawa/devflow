@@ -2,15 +2,9 @@ import Question from "@/components/forms/Question";
 import { getUserById } from "@/lib/actions/user.action";
 import { auth } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
+import React from "react";
 
-import type { Metadata } from "next";
-
-export const metadata: Metadata = {
-  title: "Ask-question | Dev Overflow",
-  description: "Ask quesiton page of Dev Overflow",
-};
-
-const AskQuestion = async () => {
+const Page = async () => {
   const { userId } = await auth();
 
   if (!userId) redirect("/sign-in");
@@ -26,4 +20,4 @@ const AskQuestion = async () => {
     </div>
   );
 };
-export default AskQuestion;
+export default Page;
