@@ -17,7 +17,6 @@ import { revalidatePath } from "next/cache";
 import Question from "@/database/question.model";
 import Tag from "@/database/tag.model";
 import Answer from "@/database/answer.model";
-import console from "console";
 
 export async function getUserById(params: any) {
   try {
@@ -39,8 +38,6 @@ export async function createUser(userData: CreateUserParams) {
     connectToDatabase();
 
     const newUser = await User.create(userData);
-    console.log(newUser.username, newUser.name, newUser.email, newUser.clerkId);
-    console.log("user created in db successfully");
 
     return newUser;
   } catch (error) {
