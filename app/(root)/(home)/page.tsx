@@ -9,6 +9,15 @@ import { HomePageFilters } from "@/constants/filters";
 import { getQuestions } from "@/lib/actions/question.action";
 import { SearchParamsProps } from "@/types";
 import Link from "next/link";
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+  openGraph: {
+    images: ["/public/assets/images/devoverflowimage.jpg"], // Update with your actual image path
+  },
+  title: "Home | Dev Overflow",
+  description: "Developer community for coding Q&A and collaboration.",
+};
 
 export default async function Home({ searchParams }: SearchParamsProps) {
   const result = await getQuestions({

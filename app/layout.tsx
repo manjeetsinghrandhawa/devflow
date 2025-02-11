@@ -1,17 +1,20 @@
-import { ClerkProvider } from "@clerk/nextjs";
-import "./globals.css";
-import "../styles/prism.css";
+/* eslint-disable camelcase */
 import React from "react";
+import { ClerkProvider } from "@clerk/nextjs";
 import { Inter, Space_Grotesk } from "next/font/google";
 import type { Metadata } from "next";
-import ThemeProvider from "@/context/ThemeProvider";
+
+import "./globals.css";
+import "../styles/prism.css";
+import { ThemeProvider } from "@/context/ThemeProvider";
 
 const inter = Inter({
   subsets: ["latin"],
   weight: ["100", "200", "300", "400", "500", "600", "700", "800", "900"],
   variable: "--font-inter",
 });
-const spaceGrotest = Space_Grotesk({
+
+const spaceGrotesk = Space_Grotesk({
   subsets: ["latin"],
   weight: ["300", "400", "500", "600", "700"],
   variable: "--font-spaceGrotesk",
@@ -20,7 +23,7 @@ const spaceGrotest = Space_Grotesk({
 export const metadata: Metadata = {
   title: "DevFlow",
   description:
-    "A community driven platform for developers asking and answering questions.Get help and answers to your questions about anything related to programming and software development from the best developers on the internet.",
+    "A community-driven platform for asking and answering programming questions. Get help, share knowledge, and collaborate with developers from around the world. Explore topics in web development, mobile app development, algorithms, data structures, and more.",
   icons: {
     icon: "/assets/images/site-logo.svg",
   },
@@ -33,7 +36,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body className={`${inter.variable} ${spaceGrotest.variable}`}>
+      <body className={`${inter.variable} ${spaceGrotesk.variable}`}>
         <ClerkProvider
           appearance={{
             elements: {
