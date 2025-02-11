@@ -7,7 +7,7 @@ const isPublicRoute = createRouteMatcher([
   "/question/:id",
   "/tags",
   "/tags/:id",
-  "profile",
+  "profile/:id",
   "/community",
   "/jobs",
 ]);
