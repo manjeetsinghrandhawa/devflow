@@ -6,6 +6,15 @@ import { UserFilters } from "@/constants/filters";
 import { getAllUsers } from "@/lib/actions/user.action";
 import { SearchParamsProps } from "@/types";
 import Link from "next/link";
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+  openGraph: {
+    images: ["/public/assets/images/devoverflowimage.jpg"], // Update with your actual image path
+  },
+  title: "Community | Dev Overflow",
+  description: "Developer community for coding Q&A and collaboration.",
+};
 
 const Page = async ({ searchParams }: SearchParamsProps) => {
   const result = await getAllUsers({
