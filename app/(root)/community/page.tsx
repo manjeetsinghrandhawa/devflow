@@ -16,7 +16,8 @@ export const metadata: Metadata = {
   description: "Developer community for coding Q&A and collaboration.",
 };
 
-const Page = async ({ searchParams }: SearchParamsProps) => {
+const Page = async (props: SearchParamsProps) => {
+  const searchParams = await props.searchParams;
   const result = await getAllUsers({
     searchQuery: searchParams.q,
     filter: searchParams.filter,

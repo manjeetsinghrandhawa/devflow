@@ -7,7 +7,8 @@ import { getAllTags } from "@/lib/actions/tag.actions";
 import { SearchParamsProps } from "@/types";
 import Link from "next/link";
 
-const Page = async ({ searchParams }: SearchParamsProps) => {
+const Page = async (props: SearchParamsProps) => {
+  const searchParams = await props.searchParams;
   const result = await getAllTags({
     searchQuery: searchParams.q,
     filter: searchParams.filter,

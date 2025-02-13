@@ -5,7 +5,9 @@ import LocalSearchbar from "@/components/shared/search/LocalSearchbar";
 import { getQuestionsByTagId } from "@/lib/actions/tag.actions";
 import { URLProps } from "@/types";
 
-const Page = async ({ params, searchParams }: URLProps) => {
+const Page = async (props: URLProps) => {
+  const searchParams = await props.searchParams;
+  const params = await props.params;
   const result = await getQuestionsByTagId({
     tagId: params.id,
     page: searchParams.page ? +searchParams.page : 1,
