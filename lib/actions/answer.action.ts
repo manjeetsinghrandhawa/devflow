@@ -176,6 +176,15 @@ export async function downvoteAnswer(params: AnswerVoteParams) {
   }
 }
 
+/**
+ * 
+ * @param answerId its requried fo r this
+ * @param path   its path
+ * @description ,.....
+ * @returns its returns object
+ *  
+ */
+
 export async function deleteAnswer(params: DeleteAnswerParams) {
   try {
     connectToDatabase();

@@ -8,6 +8,7 @@ const isPublicRoute = createRouteMatcher([
   "/tags",
   "/tags/:id",
   "profile",
+  "/profile/:id",
   "/community",
   "/jobs",
 ]);

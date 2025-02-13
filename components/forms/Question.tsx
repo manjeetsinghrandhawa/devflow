@@ -38,7 +38,7 @@ const Question = ({ type, mongoUserId, questionDetails }: Props) => {
   const parsedQuestionDetails =
     questionDetails && JSON.parse(questionDetails || "");
 
-  const groupedTags = parsedQuestionDetails?.tags.map((tag) => tag.name);
+  const groupedTags = parsedQuestionDetails?.tags.map((tag: any) => tag.name);
 
   // 1. Define your form.
   const form = useForm<z.infer<typeof QuestionsSchema>>({
@@ -132,6 +132,7 @@ const Question = ({ type, mongoUserId, questionDetails }: Props) => {
               </FormLabel>
               <FormControl className="mt-3.5">
                 <Input
+                  id="question-title"
                   className="no-focus paragraph-regular background-light900_dark300 light-border-2 text-dark300_light700 min-h-[56px] border"
                   {...field}
                 />
@@ -155,6 +156,7 @@ const Question = ({ type, mongoUserId, questionDetails }: Props) => {
               </FormLabel>
               <FormControl className="mt-3.5">
                 <Editor
+                  id="question-editor"
                   apiKey={process.env.NEXT_PUBLIC_TINY_EDITOR_API_KEY}
                   onInit={(evt, editor) => {
                     // @ts-ignore
@@ -212,6 +214,7 @@ const Question = ({ type, mongoUserId, questionDetails }: Props) => {
               <FormControl className="mt-3.5">
                 <>
                   <Input
+                    id="tags-input"
                     disabled={type === "Edit"}
                     className="no-focus paragraph-regular background-light900_dark300 light-border-2 text-dark300_light700 min-h-[56px] border"
                     placeholder="Add tags..."
