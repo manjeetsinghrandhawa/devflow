@@ -19,7 +19,7 @@ const UserCard = async ({ user }: Props) => {
 
   return (
     <div className="shadow-light100_darknone w-full max-xs:min-w-full xs:w-[260px]">
-      <article className="background-light900_dark200 light-border flex w-full flex-col items-center justify-center rounded-2xl border p-8">
+      <div className="background-light900_dark200 light-border flex w-full flex-col items-center justify-center rounded-2xl border p-8">
         <div className="relative size-24">
           <Image
             src={user.picture}
@@ -49,7 +49,7 @@ const UserCard = async ({ user }: Props) => {
             <Badge className="text-black dark:text-white">No tags yet</Badge>
           )}
         </div>
-      </article>
+      </div>
     </div>
   );
 };

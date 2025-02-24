@@ -3,7 +3,6 @@ import HomeFilters from "@/components/home/HomeFilters";
 import Filter from "@/components/shared/Filter";
 import NoResult from "@/components/shared/NoResult";
 import Pagination from "@/components/shared/Pagination";
-
 import { Button } from "@/components/ui/button";
 import { HomePageFilters } from "@/constants/filters";
 import {
@@ -16,12 +15,12 @@ import { auth } from "@clerk/nextjs/server";
 import type { Metadata } from "next";
 import { Suspense } from "react";
 import SearchWrapper from "@/components/shared/search/SearchWrapper";
+import SearchParamsHandler from "@/components/shared/SearchParamsHandler"; // Import client-side handler
 
 export const metadata: Metadata = {
   metadataBase: new URL(
     process.env.NEXT_PUBLIC_SERVER_URL || "http://localhost:3000"
   ),
-  // Update with your actual base URL
   openGraph: {
     images: ["/public/assets/images/devoverflowimage.jpg"], // Update with your actual image path
   },
@@ -56,7 +55,12 @@ export default async function Home({ searchParams }: SearchParamsProps) {
   }
 
   return (
-    <Suspense fallback={<div>Loading...</div>}>
+    <div>
+      {/* Suspense boundary for client-side search params */}
+      <Suspense fallback={<div>Loading search parameters...</div>}>
+        <SearchParamsHandler />
+      </Suspense>
+
       <div className="flex w-full flex-col-reverse justify-between gap-4 sm:flex-row sm:items-center">
         <h1 className="h1-bold text-dark100_light900">All Questions</h1>
 
@@ -103,18 +107,19 @@ export default async function Home({ searchParams }: SearchParamsProps) {
         ) : (
           <NoResult
             title="There’s no question to show"
-            description="Be the first to break the silence! 🚀 Ask a Question and kickstart the discussion. our query could be the next big thing others learn from. Get involved! 💡"
+            description="Be the first to break the silence! 🚀 Ask a Question and kickstart the discussion. Your query could be the next big thing others learn from. Get involved! 💡"
             link="/ask-question"
             linkTitle="Ask a Question"
           />
         )}
       </div>
+
       <div className="mt-10">
         <Pagination
           pageNumber={searchParams?.page ? +searchParams.page : 1}
           isNext={result.isNext}
         />
       </div>
-    </Suspense>
+    </div>
   );
 }

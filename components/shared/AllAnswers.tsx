@@ -40,7 +40,7 @@ const AllAnswers = async ({
 
       <div>
         {result.answers.map((answer) => (
-          <article key={answer._id} className="light-border border-b py-10">
+          <div key={answer._id} className="light-border border-b py-10">
             <div className="mb-8 flex flex-col-reverse justify-between gap-5 sm:flex-row sm:items-center sm:gap-2">
               <Link
                 href={`/profile/${answer.author.clerkId}`}
@@ -76,7 +76,7 @@ const AllAnswers = async ({
               </div>
             </div>
             <ParseHTML data={answer.content} />
-          </article>
+          </div>
         ))}
       </div>
 
