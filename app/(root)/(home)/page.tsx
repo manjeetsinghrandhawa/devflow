@@ -13,54 +13,61 @@ import { SearchParamsProps } from "@/types";
 import Link from "next/link";
 import { auth } from "@clerk/nextjs/server";
 import type { Metadata } from "next";
-import { Suspense } from "react";
 import SearchWrapper from "@/components/shared/search/SearchWrapper";
-import SearchParamsHandler from "@/components/shared/SearchParamsHandler"; // Import client-side handler
+import SearchParamsProvider from "@/components/shared/SearchParamsProvider"; // ✅ Import Client Component
 
 export const metadata: Metadata = {
   metadataBase: new URL(
     process.env.NEXT_PUBLIC_SERVER_URL || "http://localhost:3000"
   ),
   openGraph: {
-    images: ["/public/assets/images/devoverflowimage.jpg"], // Update with your actual image path
+    images: ["/public/assets/images/devoverflowimage.jpg"],
   },
   title: "Home | Dev Overflow",
   description: "Developer community for coding Q&A and collaboration.",
 };
 
-export default async function Home({ searchParams }: SearchParamsProps) {
+export default async function Home() {
   const { userId } = await auth();
 
+  return (
+    <SearchParamsProvider>
+      {({ q, filter, page }) => (
+        <HomeContent userId={userId} searchParams={{ q, filter, page }} />
+      )}
+    </SearchParamsProvider>
+  );
+}
+
+async function HomeContent({
+  userId,
+  searchParams,
+}: {
+  userId: string | null;
+  searchParams: { q: string; filter: string; page: string };
+}) {
   let result;
 
-  if (searchParams?.filter === "recommended") {
+  if (searchParams.filter === "recommended") {
     if (userId) {
       result = await getRecommendedQuestions({
         userId,
         searchQuery: searchParams.q,
-        page: searchParams.page ? +searchParams.page : 1,
+        page: +searchParams.page,
       });
     } else {
-      result = {
-        questions: [],
-        isNext: false,
-      };
+      result = { questions: [], isNext: false };
     }
   } else {
     result = await getQuestions({
       searchQuery: searchParams.q,
       filter: searchParams.filter,
-      page: searchParams.page ? +searchParams.page : 1,
+      page: +searchParams.page,
     });
   }
 
   return (
     <div>
-      {/* Suspense boundary for client-side search params */}
-      <Suspense fallback={<div>Loading search parameters...</div>}>
-        <SearchParamsHandler />
-      </Suspense>
-
       <div className="flex w-full flex-col-reverse justify-between gap-4 sm:flex-row sm:items-center">
         <h1 className="h1-bold text-dark100_light900">All Questions</h1>
 
@@ -115,10 +122,7 @@ export default async function Home({ searchParams }: SearchParamsProps) {
       </div>
 
       <div className="mt-10">
-        <Pagination
-          pageNumber={searchParams?.page ? +searchParams.page : 1}
-          isNext={result.isNext}
-        />
+        <Pagination pageNumber={+searchParams.page} isNext={result.isNext} />
       </div>
     </div>
   );
