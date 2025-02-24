@@ -1,13 +1,12 @@
 import QuestionCard from "@/components/cards/QuestionCard";
 import NoResult from "@/components/shared/NoResult";
 import Pagination from "@/components/shared/Pagination";
-import LocalSearchbar from "@/components/shared/search/LocalSearchbar";
+import SearchWrapper from "@/components/shared/search/SearchWrapper";
+
 import { getQuestionsByTagId } from "@/lib/actions/tag.actions";
 import { URLProps } from "@/types";
 
-const Page = async (props: URLProps) => {
-  const searchParams = await props.searchParams;
-  const params = await props.params;
+const Page = async ({ params, searchParams }: URLProps) => {
   const result = await getQuestionsByTagId({
     tagId: params.id,
     page: searchParams.page ? +searchParams.page : 1,
@@ -19,7 +18,7 @@ const Page = async (props: URLProps) => {
       <h1 className="h1-bold text-dark100_light900">{result.tagTitle}</h1>
 
       <div className="mt-11 w-full">
-        <LocalSearchbar
+        <SearchWrapper
           route={`/tags/${params.id}`}
           iconPosition="left"
           imgSrc="/assets/icons/search.svg"

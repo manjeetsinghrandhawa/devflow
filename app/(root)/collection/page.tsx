@@ -2,14 +2,15 @@ import QuestionCard from "@/components/cards/QuestionCard";
 import Filter from "@/components/shared/Filter";
 import NoResult from "@/components/shared/NoResult";
 import Pagination from "@/components/shared/Pagination";
-import LocalSearchbar from "@/components/shared/search/LocalSearchbar";
+import SearchWrapper from "@/components/shared/search/SearchWrapper";
+
 import { QuestionFilters } from "@/constants/filters";
 import { getSavedQuestions } from "@/lib/actions/user.action";
 import { SearchParamsProps } from "@/types";
 import { auth } from "@clerk/nextjs/server";
+import { Suspense } from "react";
 
-export default async function Home(props: SearchParamsProps) {
-  const searchParams = await props.searchParams;
+export default async function Home({ searchParams }: SearchParamsProps) {
   const { userId } = await auth();
 
   if (!userId) return null;
@@ -22,11 +23,11 @@ export default async function Home(props: SearchParamsProps) {
   });
 
   return (
-    <>
+    <Suspense fallback={<div>Loading...</div>}>
       <h1 className="h1-bold text-dark100_light900">Saved Questions</h1>
 
       <div className="mt-11 flex justify-between gap-5 max-sm:flex-col sm:items-center">
-        <LocalSearchbar
+        <SearchWrapper
           route="/"
           iconPosition="left"
           imgSrc="/assets/icons/search.svg"
@@ -71,6 +72,6 @@ export default async function Home(props: SearchParamsProps) {
           isNext={result.isNext}
         />
       </div>
-    </>
+    </Suspense>
   );
 }

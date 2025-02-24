@@ -1,12 +1,13 @@
+import { Suspense } from "react";
 import UserCard from "@/components/cards/UserCard";
 import Filter from "@/components/shared/Filter";
 import Pagination from "@/components/shared/Pagination";
-import LocalSearchbar from "@/components/shared/search/LocalSearchbar";
 import { UserFilters } from "@/constants/filters";
 import { getAllUsers } from "@/lib/actions/user.action";
 import { SearchParamsProps } from "@/types";
 import Link from "next/link";
 import type { Metadata } from "next";
+import SearchWrapper from "@/components/shared/search/SearchWrapper";
 
 export const metadata: Metadata = {
   openGraph: {
@@ -16,8 +17,7 @@ export const metadata: Metadata = {
   description: "Developer community for coding Q&A and collaboration.",
 };
 
-const Page = async (props: SearchParamsProps) => {
-  const searchParams = await props.searchParams;
+const Page = async ({ searchParams }: SearchParamsProps) => {
   const result = await getAllUsers({
     searchQuery: searchParams.q,
     filter: searchParams.filter,
@@ -25,11 +25,11 @@ const Page = async (props: SearchParamsProps) => {
   });
 
   return (
-    <>
+    <Suspense fallback={<div>Loading...</div>}>
       <h1 className="h1-bold text-dark100_light900">All Users</h1>
 
       <div className="mt-11 flex justify-between gap-5 max-sm:flex-col sm:items-center">
-        <LocalSearchbar
+        <SearchWrapper
           route="/community"
           iconPosition="left"
           imgSrc="/assets/icons/search.svg"
@@ -62,7 +62,7 @@ const Page = async (props: SearchParamsProps) => {
           isNext={result.isNext}
         />
       </div>
-    </>
+    </Suspense>
   );
 };
 

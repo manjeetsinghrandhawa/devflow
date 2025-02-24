@@ -1,14 +1,15 @@
+import UserCard from "@/components/cards/UserCard";
 import Filter from "@/components/shared/Filter";
 import NoResult from "@/components/shared/NoResult";
 import Pagination from "@/components/shared/Pagination";
-import LocalSearchbar from "@/components/shared/search/LocalSearchbar";
 import { TagFilters } from "@/constants/filters";
 import { getAllTags } from "@/lib/actions/tag.actions";
 import { SearchParamsProps } from "@/types";
 import Link from "next/link";
+import { Suspense } from "react";
+import SearchWrapper from "@/components/shared/search/SearchWrapper";
 
-const Page = async (props: SearchParamsProps) => {
-  const searchParams = await props.searchParams;
+const Page = async ({ searchParams }: SearchParamsProps) => {
   const result = await getAllTags({
     searchQuery: searchParams.q,
     filter: searchParams.filter,
@@ -16,11 +17,11 @@ const Page = async (props: SearchParamsProps) => {
   });
 
   return (
-    <>
+    <Suspense fallback={<div>Loading...</div>}>
       <h1 className="h1-bold text-dark100_light900">All Tags</h1>
 
       <div className="mt-11 flex justify-between gap-5 max-sm:flex-col sm:items-center">
-        <LocalSearchbar
+        <SearchWrapper
           route="/tags"
           iconPosition="left"
           imgSrc="/assets/icons/search.svg"
@@ -74,7 +75,7 @@ const Page = async (props: SearchParamsProps) => {
           isNext={result.isNext}
         />
       </div>
-    </>
+    </Suspense>
   );
 };
 
