@@ -1,7 +1,9 @@
+const withBundleAnalyzer = require("@next/bundle-analyzer")({
+  enabled: process.env.ANALYZE === "true",
+});
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   experimental: {
-    serverActions: true,
     mdxRs: true,
     serverComponentsExternalPackages: ["mongoose"],
   },
@@ -16,7 +18,9 @@ const nextConfig = {
         hostname: "*",
       },
     ],
-  },
+  }, 
+  // Add this to handle dynamic routes during export
+  output: 'standalone',
 };
 
-module.exports = nextConfig;
+module.exports = withBundleAnalyzer(nextConfig);
