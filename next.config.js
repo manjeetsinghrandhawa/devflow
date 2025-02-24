@@ -18,9 +18,9 @@ const nextConfig = {
         hostname: "*",
       },
     ],
-  }, 
+  },
   // Add this to handle dynamic routes during export
-  output: 'standalone',
+  output: "standalone",
 };
 
 module.exports = withBundleAnalyzer(nextConfig);
