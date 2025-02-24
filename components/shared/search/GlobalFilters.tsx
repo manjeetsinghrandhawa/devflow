@@ -40,7 +40,7 @@ const GlobalFilters = () => {
   return (
     <div className="flex items-center gap-5 px-5">
       <p className="text-dark400_light900 body-medium">Type: </p>
-      <div className="flex gap-3">
+      <div className="flex gap-3 ">
         {GlobalSearchFilters.map((item) => (
           <button
             type="button"
