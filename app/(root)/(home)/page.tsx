@@ -13,71 +13,52 @@ import { SearchParamsProps } from "@/types";
 import Link from "next/link";
 import { auth } from "@clerk/nextjs/server";
 import type { Metadata } from "next";
+import { Suspense } from "react";
 import SearchWrapper from "@/components/shared/search/SearchWrapper";
-import SearchParamsProvider from "@/components/shared/SearchParamsProvider"; // ✅ Import Client Component
-
 export const metadata: Metadata = {
   metadataBase: new URL(
     process.env.NEXT_PUBLIC_SERVER_URL || "http://localhost:3000"
   ),
+  // Update with your actual base URL
   openGraph: {
-    images: ["/public/assets/images/devoverflowimage.jpg"],
+    images: ["/public/assets/images/devoverflowimage.jpg"], // Update with your actual image path
   },
   title: "Home | Dev Overflow",
   description: "Developer community for coding Q&A and collaboration.",
 };
-
-export default async function Home() {
+export default async function Home({ searchParams }: SearchParamsProps) {
   const { userId } = await auth();
-
-  return (
-    <SearchParamsProvider>
-      {({ q, filter, page }) => (
-        <HomeContent userId={userId} searchParams={{ q, filter, page }} />
-      )}
-    </SearchParamsProvider>
-  );
-}
-
-async function HomeContent({
-  userId,
-  searchParams,
-}: {
-  userId: string | null;
-  searchParams: { q: string; filter: string; page: string };
-}) {
   let result;
-
-  if (searchParams.filter === "recommended") {
+  if (searchParams?.filter === "recommended") {
     if (userId) {
       result = await getRecommendedQuestions({
         userId,
         searchQuery: searchParams.q,
-        page: +searchParams.page,
+        page: searchParams.page ? +searchParams.page : 1,
       });
     } else {
-      result = { questions: [], isNext: false };
+      result = {
+        questions: [],
+        isNext: false,
+      };
     }
   } else {
     result = await getQuestions({
       searchQuery: searchParams.q,
       filter: searchParams.filter,
-      page: +searchParams.page,
+      page: searchParams.page ? +searchParams.page : 1,
     });
   }
-
   return (
-    <div>
+    <Suspense fallback={<div>Loading...</div>}>
       <div className="flex w-full flex-col-reverse justify-between gap-4 sm:flex-row sm:items-center">
         <h1 className="h1-bold text-dark100_light900">All Questions</h1>
-
         <Link href="/ask-question" className="flex justify-end max-sm:w-full">
           <Button className="primary-gradient min-h-[46px] px-4 py-3 !text-light-900">
             Ask a Question
           </Button>
         </Link>
       </div>
-
       <div className="mt-11 flex justify-between gap-5 max-sm:flex-col sm:items-center">
         <SearchWrapper
           route="/"
@@ -86,16 +67,13 @@ async function HomeContent({
           placeholder="Search for questions"
           otherClasses="flex-1"
         />
-
         <Filter
           filters={HomePageFilters}
           otherClasses="min-h-[56px] sm:min-w-[170px]"
           containerClasses="hidden max-md:flex"
         />
       </div>
-
       <HomeFilters />
-
       <div className="mt-10 flex w-full flex-col gap-6">
         {result.questions.length > 0 ? (
           result.questions.map((question) => (
@@ -114,16 +92,18 @@ async function HomeContent({
         ) : (
           <NoResult
             title="There’s no question to show"
-            description="Be the first to break the silence! 🚀 Ask a Question and kickstart the discussion. Your query could be the next big thing others learn from. Get involved! 💡"
+            description="Be the first to break the silence! 🚀 Ask a Question and kickstart the discussion. our query could be the next big thing others learn from. Get involved! 💡"
             link="/ask-question"
             linkTitle="Ask a Question"
           />
         )}
       </div>
-
       <div className="mt-10">
-        <Pagination pageNumber={+searchParams.page} isNext={result.isNext} />
+        <Pagination
+          pageNumber={searchParams?.page ? +searchParams.page : 1}
+          isNext={result.isNext}
+        />
       </div>
-    </div>
+    </Suspense>
   );
 }
