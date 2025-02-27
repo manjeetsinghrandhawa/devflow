@@ -51,7 +51,7 @@ export default function SavedQuestions({
   }, [searchParams, userId]);
 
   if (loading) {
-    return <div>Loading...</div>;
+    return <div className="text-center text-lg">Loading...</div>;
   }
 
   return (

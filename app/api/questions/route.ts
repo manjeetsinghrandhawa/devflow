@@ -4,6 +4,8 @@ import {
   getRecommendedQuestions,
 } from "@/lib/actions/question.action";
 
+export const dynamic = "force-dynamic"; // ✅ This prevents static rendering issues
+
 export async function GET(req: Request) {
   try {
     const { searchParams } = new URL(req.url);

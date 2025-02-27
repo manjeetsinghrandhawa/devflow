@@ -2,6 +2,8 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import { useAuth } from "@clerk/nextjs";
+
 import QuestionCard from "@/components/cards/QuestionCard";
 import HomeFilters from "@/components/home/HomeFilters";
 import Filter from "@/components/shared/Filter";
@@ -10,7 +12,6 @@ import Pagination from "@/components/shared/Pagination";
 import { Button } from "@/components/ui/button";
 import { HomePageFilters } from "@/constants/filters";
 import SearchWrapper from "@/components/shared/search/SearchWrapper";
-import { useAuth } from "@clerk/nextjs";
 
 interface HomeContentProps {
   searchParams: {
@@ -21,8 +22,10 @@ interface HomeContentProps {
 }
 
 export default function HomeContent({ searchParams }: HomeContentProps) {
-  const { userId } = useAuth(); // Get logged-in user ID
-  const [loading, setLoading] = useState(true);
+  const { userId } = useAuth(); // ✅ Get logged-in user ID
+
+  const [loading, setLoading] = useState<boolean>(true);
+  const [error, setError] = useState<string | null>(null);
   const [result, setResult] = useState<{ questions: any[]; isNext: boolean }>({
     questions: [],
     isNext: false,
@@ -34,17 +37,21 @@ export default function HomeContent({ searchParams }: HomeContentProps) {
 
   useEffect(() => {
     async function fetchQuestions() {
-      if (!userId) return; // Prevent fetching if no userId
+      if (!userId) return; // ✅ Prevent fetching if no userId
 
       setLoading(true);
+      setError(null);
       try {
         const res = await fetch(
           `/api/questions?q=${query}&filter=${filter}&page=${page}&userId=${userId}`
         );
+        if (!res.ok) throw new Error("Failed to fetch questions");
+
         const data = await res.json();
         setResult(data);
-      } catch (error) {
-        console.error("Error fetching questions:", error);
+      } catch (err) {
+        console.error("Error fetching questions:", err);
+        setError("Could not load questions. Please try again.");
       } finally {
         setLoading(false);
       }
@@ -54,11 +61,16 @@ export default function HomeContent({ searchParams }: HomeContentProps) {
   }, [query, filter, page, userId]);
 
   if (loading) {
-    return <div>Loading...</div>;
+    return <div className="text-center text-lg">Loading...</div>;
+  }
+
+  if (error) {
+    return <div className="text-center text-red-500">{error}</div>;
   }
 
   return (
     <div>
+      {/* Header */}
       <div className="flex w-full flex-col-reverse justify-between gap-4 sm:flex-row sm:items-center">
         <h1 className="h1-bold text-dark100_light900">All Questions</h1>
         <Link href="/ask-question" className="flex justify-end max-sm:w-full">
@@ -68,6 +80,7 @@ export default function HomeContent({ searchParams }: HomeContentProps) {
         </Link>
       </div>
 
+      {/* Search & Filters */}
       <div className="mt-11 flex justify-between gap-5 max-sm:flex-col sm:items-center">
         <SearchWrapper
           route="/"
@@ -85,9 +98,10 @@ export default function HomeContent({ searchParams }: HomeContentProps) {
 
       <HomeFilters />
 
+      {/* Question List */}
       <div className="mt-10 flex w-full flex-col gap-6">
         {result.questions.length > 0 ? (
-          result.questions.map((question: any) => (
+          result.questions.map((question) => (
             <QuestionCard key={question._id} {...question} />
           ))
         ) : (
@@ -100,9 +114,12 @@ export default function HomeContent({ searchParams }: HomeContentProps) {
         )}
       </div>
 
-      <div className="mt-10">
-        <Pagination pageNumber={page} isNext={result.isNext} />
-      </div>
+      {/* Pagination */}
+      {result.questions.length > 0 && (
+        <div className="mt-10">
+          <Pagination pageNumber={page} isNext={result.isNext} />
+        </div>
+      )}
     </div>
   );
 }

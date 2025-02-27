@@ -1,19 +1,13 @@
 import { auth } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
-import { Suspense } from "react";
-import SavedQuestions from "@/components/saved/SavedQuestions";
-import { SearchParamsProps } from "@/types";
+import SavedQuestionsWrapper from "@/components/saved/SavedQuestionsWrapper";
 
-const Page = async ({ searchParams }: SearchParamsProps) => {
+const Page = async ({ searchParams }: { searchParams: any }) => {
   const { userId } = await auth();
 
   if (!userId) redirect("/sign-in");
 
-  return (
-    <Suspense fallback={<div>Loading...</div>}>
-      <SavedQuestions userId={userId} searchParams={searchParams} />
-    </Suspense>
-  );
+  return <SavedQuestionsWrapper userId={userId} searchParams={searchParams} />;
 };
 
 export default Page;
