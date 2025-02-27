@@ -1,7 +1,7 @@
 "use client";
 
-import Profile from "@/components/forms/Profile";
 import { useEffect, useState } from "react";
+import Profile from "@/components/forms/Profile";
 
 interface EditProfileProps {
   userId: string;
@@ -13,13 +13,23 @@ export default function EditProfile({ userId }: EditProfileProps) {
 
   useEffect(() => {
     async function fetchUser() {
-      const res = await fetch(`/api/getUser?userId=${userId}`);
-      const data = await res.json();
-      setMongoUser(data);
-      setLoading(false);
+      try {
+        setLoading(true);
+        const res = await fetch(`/api/getUser?userId=${userId}`);
+        const data = await res.json();
+        setMongoUser(data);
+      } catch (error) {
+        console.error("Error fetching user data:", error);
+      } finally {
+        setLoading(false);
+      }
     }
 
-    fetchUser();
+    if (userId) {
+      fetchUser();
+    } else {
+      setLoading(false);
+    }
   }, [userId]);
 
   if (loading) {
@@ -29,9 +39,16 @@ export default function EditProfile({ userId }: EditProfileProps) {
   return (
     <div>
       <h1 className="h1-bold text-dark100_light900">Edit Profile</h1>
-      <div className="mt-9">
-        <Profile clerkId={userId} user={JSON.stringify(mongoUser)} />
-      </div>
+
+      {mongoUser ? (
+        <div className="mt-9">
+          <Profile clerkId={userId} user={JSON.stringify(mongoUser)} />
+        </div>
+      ) : (
+        <div className="text-center mt-6">
+          <p className="text-dark200_light800">User not found.</p>
+        </div>
+      )}
     </div>
   );
 }

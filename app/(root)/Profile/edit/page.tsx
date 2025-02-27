@@ -3,7 +3,13 @@ import EditProfile from "@/components/forms/EditProfile";
 export default function EditProfilePage({
   searchParams,
 }: {
-  searchParams: any;
+  searchParams: { userId?: string };
 }) {
-  return <EditProfile searchParams={searchParams} />;
+  const userId = searchParams.userId || "";
+
+  if (!userId) {
+    return <div>Error: Missing user ID</div>;
+  }
+
+  return <EditProfile userId={userId} />;
 }
