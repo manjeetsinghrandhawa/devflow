@@ -1,9 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useSearchParams } from "next/navigation";
 import Link from "next/link";
-
 import QuestionCard from "@/components/cards/QuestionCard";
 import HomeFilters from "@/components/home/HomeFilters";
 import Filter from "@/components/shared/Filter";
@@ -11,58 +9,49 @@ import NoResult from "@/components/shared/NoResult";
 import Pagination from "@/components/shared/Pagination";
 import { Button } from "@/components/ui/button";
 import { HomePageFilters } from "@/constants/filters";
-import {
-  getQuestions,
-  getRecommendedQuestions,
-} from "@/lib/actions/question.action";
 import SearchWrapper from "@/components/shared/search/SearchWrapper";
+import { useAuth } from "@clerk/nextjs";
 
-export default function HomeContent() {
-  const searchParams = useSearchParams();
-  const filter = searchParams.get("filter") || "";
-  const query = searchParams.get("q") || "";
-  const page = Number(searchParams.get("page")) || 1;
+interface HomeContentProps {
+  searchParams: {
+    q?: string;
+    filter?: string;
+    page?: string;
+  };
+}
 
+export default function HomeContent({ searchParams }: HomeContentProps) {
+  const { userId } = useAuth(); // Get logged-in user ID
+  const [loading, setLoading] = useState(true);
   const [result, setResult] = useState<{ questions: any[]; isNext: boolean }>({
     questions: [],
     isNext: false,
   });
-  const [loading, setLoading] = useState(true);
+
+  const filter = searchParams.filter || "";
+  const query = searchParams.q || "";
+  const page = Number(searchParams.page) || 1;
 
   useEffect(() => {
-    let isMounted = true; // ✅ Prevent memory leaks
-
     async function fetchQuestions() {
+      if (!userId) return; // Prevent fetching if no userId
+
+      setLoading(true);
       try {
-        setLoading(true);
-        let data;
-
-        if (filter === "recommended") {
-          data = await getRecommendedQuestions({
-            userId: "user123",
-            searchQuery: query,
-            page,
-          });
-        } else {
-          data = await getQuestions({ searchQuery: query, filter, page });
-        }
-
-        if (isMounted) {
-          setResult(data);
-          setLoading(false);
-        }
+        const res = await fetch(
+          `/api/questions?q=${query}&filter=${filter}&page=${page}&userId=${userId}`
+        );
+        const data = await res.json();
+        setResult(data);
       } catch (error) {
         console.error("Error fetching questions:", error);
-        if (isMounted) setLoading(false);
+      } finally {
+        setLoading(false);
       }
     }
 
     fetchQuestions();
-
-    return () => {
-      isMounted = false; // ✅ Cleanup function
-    };
-  }, [filter, query, page]); // ✅ Ensure dependencies change only when needed
+  }, [query, filter, page, userId]);
 
   if (loading) {
     return <div>Loading...</div>;
@@ -99,17 +88,7 @@ export default function HomeContent() {
       <div className="mt-10 flex w-full flex-col gap-6">
         {result.questions.length > 0 ? (
           result.questions.map((question: any) => (
-            <QuestionCard
-              key={question._id}
-              _id={question._id}
-              title={question.title}
-              tags={question.tags}
-              author={question.author}
-              upvotes={question.upvotes}
-              views={question.views}
-              answers={question.answers}
-              createdAt={question.createdAt}
-            />
+            <QuestionCard key={question._id} {...question} />
           ))
         ) : (
           <NoResult

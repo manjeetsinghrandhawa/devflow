@@ -3,23 +3,23 @@
 import { useEffect, useState } from "react";
 import QuestionCard from "@/components/cards/QuestionCard";
 import Filter from "@/components/shared/Filter";
-import NoResult from "@/components/shared/NoResult";
 import Pagination from "@/components/shared/Pagination";
 import SearchWrapper from "@/components/shared/search/SearchWrapper";
 import { QuestionFilters } from "@/constants/filters";
+import NoResult from "@/components/shared/NoResult";
 
 interface SavedQuestionsProps {
-  userId: string;
   searchParams: {
     q?: string;
     filter?: string;
     page?: string;
   };
+  userId: string;
 }
 
 export default function SavedQuestions({
-  userId,
   searchParams,
+  userId,
 }: SavedQuestionsProps) {
   const [result, setResult] = useState<{ questions: any[]; isNext: boolean }>({
     questions: [],
@@ -36,14 +36,19 @@ export default function SavedQuestions({
         page: searchParams.page || "1",
       });
 
-      const res = await fetch(`/api/getSavedQuestions?${queryParams}`);
-      const data = await res.json();
-      setResult(data);
-      setLoading(false);
+      try {
+        const res = await fetch(`/api/getSavedQuestions?${queryParams}`);
+        const data = await res.json();
+        setResult(data);
+      } catch (error) {
+        console.error("Error fetching saved questions:", error);
+      } finally {
+        setLoading(false);
+      }
     }
 
     fetchSavedQuestions();
-  }, [userId, searchParams]);
+  }, [searchParams, userId]);
 
   if (loading) {
     return <div>Loading...</div>;
@@ -55,10 +60,10 @@ export default function SavedQuestions({
 
       <div className="mt-11 flex justify-between gap-5 max-sm:flex-col sm:items-center">
         <SearchWrapper
-          route="/"
+          route="/saved-questions"
           iconPosition="left"
           imgSrc="/assets/icons/search.svg"
-          placeholder="Search for questions"
+          placeholder="Search your saved questions"
           otherClasses="flex-1"
         />
 
@@ -68,30 +73,20 @@ export default function SavedQuestions({
         />
       </div>
 
-      <div className="mt-10 flex w-full flex-col gap-6">
+      <section className="mt-12 flex flex-wrap gap-4">
         {result.questions.length > 0 ? (
           result.questions.map((question: any) => (
-            <QuestionCard
-              key={question._id}
-              _id={question._id}
-              title={question.title}
-              tags={question.tags}
-              author={question.author}
-              upvotes={question.upvotes}
-              views={question.views}
-              answers={question.answers}
-              createdAt={question.createdAt}
-            />
+            <QuestionCard key={question._id} {...question} />
           ))
         ) : (
           <NoResult
-            title="There’s no question saved to show"
-            description="Be the first to break the silence! 🚀 Ask a Question and kickstart the discussion. Your query could be the next big thing others learn from. Get involved! 💡"
-            link="/ask-question"
-            linkTitle="Ask a Question"
+            title="No Saved Questions"
+            description="You haven't saved any questions yet. Browse through interesting discussions and save what matters!"
+            link="/"
+            linkTitle="Browse Questions"
           />
         )}
-      </div>
+      </section>
 
       <div className="mt-10">
         <Pagination
