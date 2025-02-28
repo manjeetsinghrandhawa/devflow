@@ -11,11 +11,16 @@ import { auth } from "@clerk/nextjs/server";
 import Image from "next/image";
 import Link from "next/link";
 import React from "react";
+import { redirect } from "next/navigation"; // Import redirect function
 
 const Page = async ({ params, searchParams }: any) => {
   const { userId: clerkId } = await auth();
 
   let mongoUser;
+
+  if (!clerkId) {
+    redirect("/sign-in");
+  }
 
   if (clerkId) {
     mongoUser = await getUserById({ userId: clerkId });

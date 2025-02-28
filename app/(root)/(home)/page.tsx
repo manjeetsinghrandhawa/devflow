@@ -16,9 +16,7 @@ import type { Metadata } from "next";
 import { Suspense } from "react";
 import SearchWrapper from "@/components/shared/search/SearchWrapper";
 export const metadata: Metadata = {
-  metadataBase: new URL(
-    process.env.NEXT_PUBLIC_SERVER_URL || "http://localhost:3000"
-  ),
+  metadataBase: new URL("http://localhost:3000"),
   // Update with your actual base URL
   openGraph: {
     images: ["/public/assets/images/devoverflowimage.jpg"], // Update with your actual image path
