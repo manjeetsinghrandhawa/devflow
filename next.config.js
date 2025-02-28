@@ -20,7 +20,7 @@ const nextConfig = {
     ],
   },
   // Add this to handle dynamic routes during export
-  output: "standalone",
+  output: "standalone,exports",
 };
 
 module.exports = withBundleAnalyzer(nextConfig);

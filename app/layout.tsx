@@ -1,7 +1,7 @@
 import { ClerkProvider } from "@clerk/nextjs";
 import "./globals.css";
 import "../styles/prism.css";
-import React from "react";
+import React, { Suspense } from "react";
 import { Inter, Space_Grotesk } from "next/font/google";
 import type { Metadata } from "next";
 import ThemeProvider from "@/context/ThemeProvider";
@@ -34,16 +34,19 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={`${inter.variable} ${spaceGrotest.variable}`}>
-        <ClerkProvider
-          appearance={{
-            elements: {
-              formButtonPrimary: "primary-gradient",
-              footerActionLink: "primary-text-gradient hover:text-primary-500",
-            },
-          }}
-        >
-          <ThemeProvider>{children}</ThemeProvider>
-        </ClerkProvider>
+        <Suspense>
+          <ClerkProvider
+            appearance={{
+              elements: {
+                formButtonPrimary: "primary-gradient",
+                footerActionLink:
+                  "primary-text-gradient hover:text-primary-500",
+              },
+            }}
+          >
+            <ThemeProvider>{children}</ThemeProvider>
+          </ClerkProvider>
+        </Suspense>
       </body>
     </html>
   );
