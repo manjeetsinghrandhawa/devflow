@@ -1,16 +1,23 @@
+import Question from "@/components/forms/Question";
+import { getUserById } from "@/lib/actions/user.action";
 import { auth } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
-import { Suspense } from "react";
-import AskQuestionWrapper from "@/components/forms/AskQuestionWrapper";
+import React from "react";
 
-export default async function Page() {
+const Page = async () => {
   const { userId } = await auth();
 
   if (!userId) redirect("/sign-in");
 
+  const mongoUser = await getUserById({ userId });
+
   return (
-    <Suspense fallback={<div>Loading...</div>}>
-      <AskQuestionWrapper userId={userId} />
-    </Suspense>
+    <div>
+      <h1 className="h1-bold text-dark100_light900">Ask a question</h1>
+      <div className="mt-9">
+        <Question mongoUserId={JSON.stringify(mongoUser?._id)} />
+      </div>
+    </div>
   );
-}
+};
+export default Page;

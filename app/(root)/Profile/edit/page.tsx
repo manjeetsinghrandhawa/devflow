@@ -1,20 +1,25 @@
+import Profile from "@/components/forms/Profile";
+import { getUserById } from "@/lib/actions/user.action";
+import { ParamsProps } from "@/types";
+import { auth } from "@clerk/nextjs/server";
 import { Suspense } from "react";
-import EditProfileWrapper from "@/components/forms/EditProfileWrapper";
 
-export default function EditProfilePage({
-  searchParams,
-}: {
-  searchParams: { userId?: string };
-}) {
-  const userId = searchParams.userId || "";
+const Page = async ({ params }: ParamsProps) => {
+  const { userId } = await auth();
 
-  if (!userId) {
-    return <div>Error: Missing user ID</div>;
-  }
+  if (!userId) return null;
+
+  const mongoUser = await getUserById({ userId });
 
   return (
     <Suspense fallback={<div>Loading...</div>}>
-      <EditProfileWrapper userId={userId} />
+      <h1 className="h1-bold text-dark100_light900">Edit Profile</h1>
+
+      <div className="mt-9">
+        <Profile clerkId={userId} user={JSON.stringify(mongoUser)} />
+      </div>
     </Suspense>
   );
-}
+};
+
+export default Page;
